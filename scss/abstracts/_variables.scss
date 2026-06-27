@@ -1,0 +1,39 @@
+// Variables for Gymnastics Hub
+$primary-color: #ffffff;
+$secondary-color: #0b090a;
+$accent-color: #f72585;
+
+$bg-color: #0b090a;
+$text-color: #ffffff;
+$text-muted: rgba(255, 255, 255, 0.7);
+
+$font-main: 'Raleway', sans-serif;
+
+$container-width: 1440px;
+$container-narrow: 1440px;
+
+$transition-speed: 0.3s;
+$border-radius: 50px;
+$card-radius: 24px;
+
+// Glassmorphism and specialized colors
+$glass-bg: rgba(255, 255, 255, 0.1);
+$glass-border: rgba(255, 255, 255, 0.1);
+$input-bg: #f5f5f5;
+$input-text: #1a1a1a;
+$tab-active: #C29661;
+
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin respond-to($breakpoint) {
+    @if $breakpoint == "tablet" {
+        @media (max-width: 1024px) { @content; }
+    }
+    @else if $breakpoint == "mobile" {
+        @media (max-width: 768px) { @content; }
+    }
+}

@@ -1,0 +1,118 @@
+/**
+ * Custom Login Styles for Gymnastics Hub
+ */
+
+ body.login {
+    background: #0a0a0a !important;
+    background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%) !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 50px;
+}
+
+#login {
+    padding: 0;
+    width: 350px;
+}
+
+.login h1 a {
+    background-image: url('../img/logo.svg') !important;
+    background-size: 40px !important;
+    background-repeat: no-repeat !important;
+    background-position: center top !important;
+    display: block;
+    width: 100% !important;
+    height: 50px !important;
+    margin: 0 auto 10px !important;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #BA8748 !important;
+    text-align: center;
+    padding-top: 50px !important;
+    text-decoration: none !important;
+    line-height: 1.2 !important;
+    text-indent: 0 !important;
+}
+
+/* Form Styling */
+.login form {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+    padding: 40px 30px !important;
+}
+
+.login label {
+    color: #999 !important;
+    font-size: 13px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.login input[type="text"], 
+.login input[type="password"] {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+    margin-bottom: 20px !important;
+    transition: all 0.3s ease;
+}
+
+.login input[type="text"]:focus, 
+.login input[type="password"]:focus {
+    border-color: #BA8748 !important;
+    box-shadow: 0 0 10px rgba(186, 135, 72, 0.3) !important;
+    outline: none;
+}
+
+/* Submit Button */
+.login .button-primary {
+    background: #BA8748 !important;
+    border: none !important;
+    border-radius: 100px !important;
+    box-shadow: 0 10px 20px rgba(186, 135, 72, 0.2) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100% !important;
+    height: 50px !important;
+    line-height: 50px !important;
+    margin-top: 10px !important;
+    transition: all 0.3s ease !important;
+}
+
+.login .button-primary:hover {
+    background: #d4a05d !important;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(186, 135, 72, 0.3) !important;
+}
+
+/* Bottom Links */
+.login #nav a, 
+.login #backtoblog a {
+    color: #666 !important;
+    transition: color 0.3s ease;
+}
+
+.login #nav a:hover, 
+.login #backtoblog a:hover {
+    color: #BA8748 !important;
+}
+
+/* Error Messages */
+.login .message, 
+.login #login_error {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-left: 4px solid #BA8748 !important;
+    color: #ccc !important;
+    border-radius: 8px;
+}

@@ -1,0 +1,113 @@
+/**
+ * Premium Admin Styles for Gymnastics Hub
+ */
+
+/* Root Colors */
+:root {
+    --gh-gold: #BA8748;
+    --gh-dark: #1a1a1a;
+    --gh-sidebar: #111111;
+}
+
+/* Sidebar Styling */
+#adminmenu, 
+#adminmenu .wp-submenu, 
+#adminmenuback, 
+#adminmenuwrap {
+    background-color: var(--gh-sidebar) !important;
+}
+
+#adminmenu a {
+    color: #bbb !important;
+    transition: all 0.2s ease;
+}
+
+#adminmenu li.current a.menu-top, 
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+#adminmenu li.menu-top:hover, 
+#adminmenu li.opensub > a.menu-top {
+    background: var(--gh-dark) !important;
+    color: var(--gh-gold) !important;
+}
+
+#adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head, 
+#adminmenu .wp-menu-arrow, 
+#adminmenu .wp-menu-arrow div, 
+#adminmenu li.current a.menu-top:after, 
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu:after {
+    border-right-color: var(--gh-gold) !important;
+}
+
+/* Admin Bar (Top Bar) */
+#wpadminbar {
+    background: var(--gh-sidebar) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+#wpadminbar .ab-item, 
+#wpadminbar a.ab-item, 
+#wpadminbar > #wp-toolbar span.ab-label, 
+#wpadminbar > #wp-toolbar span.noticon {
+    color: #eee !important;
+}
+
+#wpadminbar .ab-top-menu > li:hover > .ab-item, 
+#wpadminbar .ab-top-menu > li.hover > .ab-item, 
+#wpadminbar .ab-item:focus {
+    background: var(--gh-dark) !important;
+    color: var(--gh-gold) !important;
+}
+
+/* Hide WordPress Logo in Top Left */
+#wp-admin-bar-wp-logo {
+    display: none !important;
+}
+
+/* Add Brand Style to Site Name in Top Bar */
+#wp-admin-bar-site-name > .ab-item {
+    font-weight: 700 !important;
+    color: var(--gh-gold) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Buttons Styling */
+.wp-core-ui .button-primary {
+    background: var(--gh-gold) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 10px rgba(186, 135, 72, 0.2) !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+    text-shadow: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.wp-core-ui .button-primary:hover {
+    background: #d4a05d !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(186, 135, 72, 0.3) !important;
+}
+
+.wp-core-ui .button-secondary {
+    border-radius: 8px !important;
+    border: 1px solid #ddd !important;
+}
+
+/* Rounded Corners for Dashboard Widgets and Boxes */
+.postbox, .welcome-panel {
+    border-radius: 16px !important;
+    border: 1px solid #eee !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    overflow: hidden;
+}
+
+.postbox-header {
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: #fafafa !important;
+}
+
+/* Body Background */
+#wpcontent, #wpfooter {
+    background: #fdfdfd;
+}

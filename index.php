@@ -4,7 +4,7 @@
 */
 get_header(); ?>
 
-
+<!-- TEST IF GIT WORKS -->
 <main>
         <section class="hero-section">
             <div class="container hero-section__grid">

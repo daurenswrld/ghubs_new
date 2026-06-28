@@ -40,10 +40,12 @@
                             <button class="filter-tag active" data-type="all">Все</button>
                             <?php 
                             $types = get_terms(array('taxonomy' => 'event_type', 'hide_empty' => false));
+                            $types = gh_sort_event_types($types);
                             foreach ($types as $type) : ?>
                                 <button class="filter-tag" data-type="<?php echo $type->slug; ?>"><?php echo $type->name; ?></button>
                             <?php endforeach; ?>
                         </div>
+                        <div class="filter-divider"></div>
                     </div>
 
                     <div class="filter-group">
@@ -82,6 +84,7 @@
                                 <p style="color: #999; font-size: 14px;">Мероприятий пока нет</p>
                             </div>
                         <?php endif; ?>
+                        <div class="filter-divider"></div>
                     </div>
 
                     <div class="filter-group">
@@ -122,11 +125,70 @@
                             'order'          => 'ASC'
                         );
                         $meta_query = array('relation' => 'AND');
+                        $selected_date_start = !empty($_GET['date_start']) ? sanitize_text_field($_GET['date_start']) : '';
+                        $selected_date_end = !empty($_GET['date_end']) ? sanitize_text_field($_GET['date_end']) : '';
                         $selected_date = !empty($_GET['date']) ? sanitize_text_field($_GET['date']) : '';
                         $selected_country = !empty($_GET['country']) ? sanitize_text_field($_GET['country']) : '';
                         
-                        // If specific date is selected, filter by it. Otherwise show future events.
-                        if (!empty($selected_date)) {
+                        if (!empty($selected_date_start) || !empty($selected_date_end)) {
+                            if (!empty($selected_date_start) && !empty($selected_date_end)) {
+                                $meta_query[] = array(
+                                    'relation' => 'AND',
+                                    array(
+                                        'key'     => '_event_start_date',
+                                        'value'   => $selected_date_end,
+                                        'compare' => '<=',
+                                        'type'    => 'DATE'
+                                    ),
+                                    array(
+                                        'relation' => 'OR',
+                                        array(
+                                            'key'     => '_event_end_date',
+                                            'value'   => $selected_date_start,
+                                            'compare' => '>=',
+                                            'type'    => 'DATE'
+                                        ),
+                                        array(
+                                            'relation' => 'AND',
+                                            array(
+                                                'key'     => '_event_end_date',
+                                                'value'   => '',
+                                                'compare' => '='
+                                            ),
+                                            array(
+                                                'key'     => '_event_start_date',
+                                                'value'   => $selected_date_start,
+                                                'compare' => '>=',
+                                                'type'    => 'DATE'
+                                            )
+                                        )
+                                    )
+                                );
+                            } elseif (!empty($selected_date_start)) {
+                                $meta_query[] = array(
+                                    'relation' => 'OR',
+                                    array(
+                                        'key'     => '_event_start_date',
+                                        'value'   => $selected_date_start,
+                                        'compare' => '>=',
+                                        'type'    => 'DATE'
+                                    ),
+                                    array(
+                                        'key'     => '_event_end_date',
+                                        'value'   => $selected_date_start,
+                                        'compare' => '>=',
+                                        'type'    => 'DATE'
+                                    )
+                                );
+                            } else {
+                                $meta_query[] = array(
+                                    'key'     => '_event_start_date',
+                                    'value'   => $selected_date_end,
+                                    'compare' => '<=',
+                                    'type'    => 'DATE'
+                                );
+                            }
+                        } elseif (!empty($selected_date)) {
                             $meta_query[] = array(
                                 'relation' => 'AND',
                                 array(
@@ -185,7 +247,7 @@
                                 )
                             );
                         }
-
+ 
                         $selected_type = !empty($_GET['e_type']) ? $_GET['e_type'] : (!empty($_GET['event_type']) ? $_GET['event_type'] : 'all');
                         if ($selected_type !== 'all') {
                             $args['tax_query'] = array(
@@ -196,7 +258,7 @@
                                 )
                             );
                         }
-
+ 
                         if (!empty($selected_country)) {
                             $meta_query[] = array(
                                 'key'     => '_event_location_country',
@@ -204,7 +266,7 @@
                                 'compare' => 'LIKE'
                             );
                         }
-
+ 
                         if (!empty($_GET['city'])) {
                             $meta_query[] = array(
                                 'key'     => '_event_location_city',
@@ -212,12 +274,19 @@
                                 'compare' => 'LIKE'
                             );
                         }
-
+ 
                         $args['meta_query'] = $meta_query;
                         $query = new WP_Query($args);
-
-                        if ($query->have_posts()) :
-                            while ($query->have_posts()) : $query->the_post();
+ 
+                        if ($query->have_posts()) {
+                            $active_ads = gh_get_active_ads('3', -1);
+                            $ad_index = 0;
+                            $counter = 0;
+                            $sorted_posts = gh_sort_events_by_type($query->posts);
+                            global $post;
+                            foreach ($sorted_posts as $post) {
+                                setup_postdata($post);
+                                $counter++;
                                 $start_date = get_post_meta(get_the_ID(), '_event_start_date', true);
                                 $end_date   = get_post_meta(get_the_ID(), '_event_end_date', true);
                                 $city       = get_post_meta(get_the_ID(), '_event_location_city', true);
@@ -257,8 +326,51 @@
                                         </div>
                                     </div>
                                 </div>
-                            <?php endwhile; wp_reset_postdata();
-                        else : ?>
+                                <?php
+                                if ($counter % 4 == 0) {
+                                    $ad_card = null;
+                                    if (!empty($active_ads)) {
+                                        $ad_card = $active_ads[$ad_index % count($active_ads)];
+                                        $ad_index++;
+                                    }
+                                    $ad_img  = $ad_card ? $ad_card['image'] : get_template_directory_uri() . '/img/ad-test.png';
+                                    $ad_link = $ad_card ? $ad_card['link'] : '#!';
+                                    $is_empty_ad = empty($ad_card);
+                                    ?>
+                                    <div class="event-ad-card">
+                                        <a href="<?php echo esc_url($ad_link); ?>" <?php echo ($ad_link !== '#!') ? 'target="_blank"' : ''; ?> style="display:block;height:100%;min-height:400px;text-decoration:none;">
+                                            <div class="event-ad-card__bg">
+                                                <img src="<?php echo esc_url($ad_img); ?>" alt="Advertisement">
+                                            </div>
+                                            <?php if ($is_empty_ad) : ?>
+                                            <div class="event-ad-card__content">
+                                                <h3 class="ad-title">JOIN OUR <br>COMMUNITY</h3>
+                                                <p class="ad-subtitle">Everything about gymnastics</p>
+                                            </div>
+                                            <?php endif; ?>
+                                        </a>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                            wp_reset_postdata();
+
+                            // Append remaining unused ads at the end
+                            if (!empty($active_ads) && $ad_index < count($active_ads)) {
+                                for ($i = $ad_index; $i < count($active_ads); $i++) {
+                                    $ad_card = $active_ads[$i];
+                                    ?>
+                                    <div class="event-ad-card">
+                                        <a href="<?php echo esc_url($ad_card['link']); ?>" <?php echo ($ad_card['link'] !== '#!') ? 'target="_blank"' : ''; ?> style="display:block;height:100%;min-height:400px;text-decoration:none;">
+                                            <div class="event-ad-card__bg">
+                                                <img src="<?php echo esc_url($ad_card['image']); ?>" alt="Advertisement">
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                        } else { ?>
                             <div class="empty-state" style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 20px; grid-column: 1 / -1; width: 100%;">
                                 <div class="empty-state__icon" style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
                                     <img src="<?php echo get_template_directory_uri(); ?>/img/search-gray.svg" alt="Not found" style="width: 40px; height: 40px; opacity: 0.5;">
@@ -270,11 +382,11 @@
                                     <a href="<?php echo site_url('/add-event/'); ?>" class="btn btn--black">Добавить событие</a>
                                 </div>
                             </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <?php } ?>
+                    </div><!-- /events-list #eventsGrid -->
+                </div><!-- /catalog-grid -->
+            </div><!-- /catalog-layout -->
+        </div><!-- /container--wide -->
     </main>
 
 <script>

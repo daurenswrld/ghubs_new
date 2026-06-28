@@ -364,7 +364,13 @@ function gh_filter_events() {
     ob_start();
 
     if ($query->have_posts()) :
-        while ($query->have_posts()) : $query->the_post();
+        $active_ads = gh_get_active_ads('3', -1);
+        $ad_index = 0;
+        $counter = 0;
+        $sorted_posts = gh_sort_events_by_type($query->posts);
+        global $post;
+        foreach ($sorted_posts as $post) : setup_postdata($post);
+            $counter++;
             $start_date = get_post_meta(get_the_ID(), '_event_start_date', true);
             $end_date   = get_post_meta(get_the_ID(), '_event_end_date', true);
             $city       = get_post_meta(get_the_ID(), '_event_location_city', true);
@@ -404,7 +410,55 @@ function gh_filter_events() {
                     </div>
                 </div>
             </div>
-        <?php endwhile; wp_reset_postdata();
+            <?php
+            if ($counter % 4 == 0) {
+                $ad_card = null;
+                if (!empty($active_ads)) {
+                    $ad_card = $active_ads[$ad_index % count($active_ads)];
+                    $ad_index++;
+                }
+                $ad_img = $ad_card ? $ad_card['image'] : get_template_directory_uri() . '/img/ad-test.png';
+                $ad_link = $ad_card ? $ad_card['link'] : '#!';
+                $is_empty_ad = empty($ad_card);
+                ?>
+                <div class="event-ad-card">
+                    <a href="<?php echo esc_url($ad_link); ?>" <?php echo ($ad_link !== '#!') ? 'target="_blank"' : ''; ?> style="display: block; height: 100%; min-height: 400px; text-decoration: none;">
+                        <div class="event-ad-card__bg">
+                            <img src="<?php echo esc_url($ad_img); ?>" alt="Advertisement">
+                        </div>
+                        <?php if ($is_empty_ad) : ?>
+                        <div class="event-ad-card__content">
+                            <h3 class="ad-title">JOIN OUR <br>COMMUNITY</h3>
+                            <p class="ad-subtitle">Everything about gymnastics</p>
+                        </div>
+                        <?php endif; ?>
+                    </a>
+                </div>
+                <?php
+            }
+            ?>
+        <?php 
+        endforeach; 
+        wp_reset_postdata();
+
+        // Output remaining ads at the end of the events list
+        if (!empty($active_ads) && $ad_index < count($active_ads)) {
+            for ($i = $ad_index; $i < count($active_ads); $i++) {
+                $ad_card = $active_ads[$i];
+                $ad_img = $ad_card['image'];
+                $ad_link = $ad_card['link'];
+                ?>
+                <div class="event-ad-card">
+                    <a href="<?php echo esc_url($ad_link); ?>" <?php echo ($ad_link !== '#!') ? 'target="_blank"' : ''; ?> style="display: block; height: 100%; min-height: 400px; text-decoration: none;">
+                        <div class="event-ad-card__bg">
+                            <img src="<?php echo esc_url($ad_img); ?>" alt="Advertisement">
+                        </div>
+                    </a>
+                </div>
+                <?php
+            }
+        }
+        ?>
     else : ?>
         <div class="empty-state" style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 20px; grid-column: 1 / -1; width: 100%;">
             <div class="empty-state__icon" style="width: 80px; height: 80px; background: #F3F4F6; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">

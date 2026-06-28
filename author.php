@@ -113,9 +113,33 @@ get_header(); ?>
                                 <span class="detail-value" style="font-size: 16px; font-weight: 600; color: #1a1a1a;"><?php echo $gh_coaches_count ? esc_html($gh_coaches_count) : 'Не указано'; ?></span>
                             </div>
 
-                            <div class="detail-item">
-                                <span class="detail-label" style="display: block; font-size: 13px; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Подготовлено ЗМС, МСМК, МС, КМС</span>
-                                <span class="detail-value" style="font-size: 16px; font-weight: 600; color: #1a1a1a;"><?php echo $gh_ranked_athletes_count ? esc_html($gh_ranked_athletes_count) : 'Не указано'; ?></span>
+                            <div class="detail-item" style="grid-column: 1 / -1; border-top: 1px solid #f2f2f2; border-bottom: 1px solid #f2f2f2; padding: 15px 0; margin: 5px 0;">
+                                <span class="detail-label" style="display: block; font-size: 13px; color: #999; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Подготовлено спортсменов, воспитанных в клубе</span>
+                                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                    <?php 
+                                    $has_athletes = false;
+                                    $athletes_data = array(
+                                        'ЗМС' => get_user_meta($user_id, 'gh_zms_count', true),
+                                        'МСМК' => get_user_meta($user_id, 'gh_msmk_count', true),
+                                        'МС' => get_user_meta($user_id, 'gh_ms_count', true),
+                                        'КМС' => get_user_meta($user_id, 'gh_kms_count', true),
+                                        'Разрядники' => get_user_meta($user_id, 'gh_razryad_count', true),
+                                    );
+                                    foreach ($athletes_data as $label => $val) {
+                                        if ($val !== '' && $val !== null) {
+                                            $has_athletes = true;
+                                            echo '<div style="background: #f7f9fc; padding: 6px 14px; border-radius: 12px; border: 1px solid #eef2f6; font-size: 14px; font-weight: 600; color: #1a1a1a;">' . esc_html($label) . ': <span style="color: #ff4b4b; font-weight: 700;">' . esc_html($val) . '</span></div>';
+                                        }
+                                    }
+                                    if (!$has_athletes) {
+                                        if ($gh_ranked_athletes_count) {
+                                            echo '<div style="background: #f7f9fc; padding: 6px 14px; border-radius: 12px; border: 1px solid #eef2f6; font-size: 14px; font-weight: 600; color: #1a1a1a;">Всего: <span style="color: #ff4b4b; font-weight: 700;">' . esc_html($gh_ranked_athletes_count) . '</span></div>';
+                                        } else {
+                                            echo '<span style="font-size: 14px; color: #999;">Не указано</span>';
+                                        }
+                                    }
+                                    ?>
+                                </div>
                             </div>
 
                             <div class="detail-item">

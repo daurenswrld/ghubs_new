@@ -50,15 +50,15 @@ function gh_is_profane($text) {
         }
     }
 
-    // 2. Check for word count (Max 3 words)
+    // 2. Check for word count (Max 10 words)
     $words = preg_split('/\s+/', trim($text));
-    if (count($words) > 3) {
-        return array('error' => true, 'message' => 'Имя должно содержать не более 3 слов.');
+    if (count($words) > 10) {
+        return array('error' => true, 'message' => 'Имя должно содержать не более 10 слов.');
     }
 
-    // 3. Check for total length (Max 30 chars)
-    if (mb_strlen($text) > 30) {
-        return array('error' => true, 'message' => 'Имя слишком длинное (макс. 30 символов).');
+    // 3. Check for total length (Max 100 chars)
+    if (mb_strlen($text) > 100) {
+        return array('error' => true, 'message' => 'Имя слишком длинное (макс. 100 символов).');
     }
 
     return array('error' => false);

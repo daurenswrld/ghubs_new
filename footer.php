@@ -37,11 +37,11 @@
                 </div>
 
                 <div class="footer__col footer__socials">
-					<span class="contact-label">Социальные сети</span>
-                    <?php $insta = get_option('gh_contact_instagram', 'https://instagram.com'); ?>
-                    <a  style="margin-top:10px;" href="<?php echo esc_url($insta); ?>" class="social-link instagram" target="_blank">
-                        <img src="<?php echo get_template_directory_uri(); ?>/img/instagram.svg" alt="Instagram" class="social-icon">
-                    </a>
+                    <div class="contact-item">
+                        <span class="contact-label">Социальные сети</span>
+                        <?php $insta = get_option('gh_contact_instagram', 'https://instagram.com'); ?>
+                        <a href="<?php echo esc_url($insta); ?>" class="contact-value" target="_blank">Instagram</a>
+                    </div>
                 </div>
             </div>
 
@@ -78,9 +78,12 @@
                 </span>
                 <div class="mobile-dropdown">
                     <a href="<?php echo esc_url(home_url('/events/')); ?>">Все</a>
-                    <a href="#">Турниры</a>
-                    <a href="#">Сборы</a>
-                    <a href="#">Семинары & мастер-классы</a>
+                    <?php 
+                    $mobile_types = get_terms(array('taxonomy' => 'event_type', 'hide_empty' => false));
+                    $mobile_types = gh_sort_event_types($mobile_types);
+                    foreach ($mobile_types as $m_type) : ?>
+                        <a href="<?php echo esc_url(home_url('/events/?event_type=' . $m_type->slug)); ?>"><?php echo $m_type->name; ?></a>
+                    <?php endforeach; ?>
                 </div>
             </li>
             <li class="mobile-nav__item">

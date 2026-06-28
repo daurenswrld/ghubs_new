@@ -4,7 +4,7 @@
 */
 get_header(); ?>
 
-<!-- TEST IF GIT WORKS -->
+
 <main>
         <section class="hero-section">
             <div class="container hero-section__grid">
@@ -22,6 +22,7 @@ get_header(); ?>
                             <button type="button" class="tab-btn active" data-type="all">Все</button>
                             <?php 
                             $types = get_terms(array('taxonomy' => 'event_type', 'hide_empty' => false));
+                            $types = gh_sort_event_types($types);
                             foreach ($types as $type) : ?>
                                 <button type="button" class="tab-btn" data-type="<?php echo $type->slug; ?>"><?php echo $type->name; ?></button>
                             <?php endforeach; ?>
@@ -49,10 +50,15 @@ get_header(); ?>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="input-group">
-                                <input type="date" name="date" class="search-input">
+                            <div class="date-row" style="margin-top: 10px; display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+                                <span class="date-label">Дата проведения</span>
+                                <div class="date-picker-bar" style="width:100%">
+                                    <input type="date" name="date_start" class="search-input" style="background:none;padding:0;width: 50%;border-radius:0;border:0;outline:none;" placeholder="с">
+                                    <div class="date-separator"></div>
+                                    <input type="date" name="date_end" class="search-input" style="background:none;padding:0;width: 50%;border-radius:0;border:0;outline:none;" placeholder="по">
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn--black btn--find">Найти</button>
+                            <button type="submit" class="btn btn--black btn--find" style="margin-top: 10px; width: 100%;">Найти</button>
                         </div>
                     </form>
                 </div>
@@ -167,10 +173,28 @@ get_header(); ?>
                     $counter = 0;
 
                     if ($event_query->have_posts()) :
-                        while ($event_query->have_posts()) : $event_query->the_post();
+                        $sorted_posts = gh_sort_events_by_type($event_query->posts);
+                        global $post;
+                        foreach ($sorted_posts as $post) : setup_postdata($post);
                             $counter++;
                             $date = get_post_meta(get_the_ID(), '_event_start_date', true);
                             $end = get_post_meta(get_the_ID(), '_event_end_date', true);
+                            $country = get_post_meta(get_the_ID(), '_event_location_country', true);
+                            $city = get_post_meta(get_the_ID(), '_event_location_city', true);
+                            
+                            $location_display = '';
+                            if ($country && $city) {
+                                $location_display = $country . ', ' . $city;
+                            } elseif ($country) {
+                                $location_display = $country;
+                            } elseif ($city) {
+                                $location_display = $city;
+                            } else {
+                                $location_display = 'Локация не указана';
+                            }
+
+                            $terms = get_the_terms(get_the_ID(), 'event_type');
+                            $type_name = !empty($terms) && !is_wp_error($terms) ? $terms[0]->name : 'Мероприятие';
                             
                             // Insert Ad Banner after 2nd card
                             if ($counter == 3) : ?>
@@ -202,16 +226,28 @@ get_header(); ?>
                                     <?php endif; ?>
                                 </div>
                                 <div class="event-card__content">
-                                    <h3 class="event-card__title"><?php the_title(); ?></h3>
+                                    <div class="event-card__top">
+                                        <div class="event-card__meta">
+                                            <span class="meta-tag"><?php echo esc_html($type_name); ?></span>
+                                        </div>
+                                        <h3 class="event-card__title"><?php the_title(); ?></h3>
+                                        <div class="meta-item location">
+                                            <img src="<?php echo get_template_directory_uri(); ?>/img/geo.svg" alt="Location" class="meta-icon">
+                                            <span><?php echo esc_html($location_display); ?></span>
+                                        </div>
+                                    </div>
                                     <div class="event-card__bottom">
-                                        <span style="color:#000;"><?php echo gh_format_event_date($date, $end); ?></span>
+                                        <div class="meta-item date">
+                                            <img src="<?php echo get_template_directory_uri(); ?>/img/date-gold.svg" alt="Date" class="meta-icon">
+                                            <span><?php echo gh_format_event_date($date, $end); ?></span>
+                                        </div>
                                         <a href="<?php the_permalink(); ?>" class="event-card__arrow">
                                             <img src="<?php echo get_template_directory_uri(); ?>/img/arrow-right.svg" alt="Details">
                                         </a>
                                     </div>
                                 </div>
                             </div>
-                        <?php endwhile; wp_reset_postdata();
+                        <?php endforeach; wp_reset_postdata();
                     else : ?>
                         <div class="empty-state-home" style="grid-column: 1 / -1; padding: 40px 20px; text-align: center; background: rgba(0,0,0,0.03); border: 1px dashed rgba(0,0,0,0.1); border-radius: 24px; width: 100%;">
                             <div class="empty-state-home__icon" style="margin-bottom: 16px; opacity: 0.5;">

@@ -167,9 +167,14 @@ function gymnastics_hub_scripts_styles() {
     // Fonts
     wp_enqueue_style('gymnastics-hub-fonts', 'https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap', array(), null);
     
-    // Styles
-    wp_enqueue_style('gymnastics-hub-main-style', get_stylesheet_uri(), array(), '1.1.0');
-    wp_enqueue_style('gymnastics-hub-custom-style', get_template_directory_uri() . '/css/style.css', array(), '1.1.0');
+    // Styles (Cache-busting with filemtime)
+    $main_css_path = get_stylesheet_directory() . '/style.css';
+    $main_css_ver = file_exists($main_css_path) ? filemtime($main_css_path) : '1.1.0';
+    wp_enqueue_style('gymnastics-hub-main-style', get_stylesheet_uri(), array(), $main_css_ver);
+    
+    $custom_css_path = get_template_directory() . '/css/style.css';
+    $custom_css_ver = file_exists($custom_css_path) ? filemtime($custom_css_path) : '1.1.0';
+    wp_enqueue_style('gymnastics-hub-custom-style', get_template_directory_uri() . '/css/style.css', array(), $custom_css_ver);
     
     // Scripts
     wp_enqueue_script('gymnastics-hub-lenis', 'https://unpkg.com/lenis@1.1.20/dist/lenis.min.js', array(), '1.1.20', true);
@@ -194,6 +199,72 @@ function gymnastics_hub_scripts_styles() {
     ));
 }
 add_action('wp_enqueue_scripts', 'gymnastics_hub_scripts_styles');
+
+/**
+ * Helper: Sort Event Types Taxonomy Terms
+ * Order: 1. Tournaments/Competitions, 2. Training Camps, 3. Seminars/Masterclasses
+ */
+function gh_sort_event_types($terms) {
+    if (empty($terms) || is_wp_error($terms)) return $terms;
+
+    $sorted = array();
+    $type1 = null; // tournaments
+    $type2 = null; // camps
+    $type3 = null; // seminars
+    $other = array();
+
+    foreach ($terms as $term) {
+        $slug = mb_strtolower($term->slug);
+        if (strpos($slug, 'turnir') !== false || strpos($slug, 'sorevn') !== false || strpos($slug, 'comp') !== false || strpos($slug, 'tourn') !== false) {
+            $type1 = $term;
+        } elseif (strpos($slug, 'sbor') !== false || strpos($slug, 'camp') !== false || strpos($slug, 'tren') !== false) {
+            $type2 = $term;
+        } elseif (strpos($slug, 'semin') !== false || strpos($slug, 'master') !== false || strpos($slug, 'klass') !== false || strpos($slug, 'class') !== false) {
+            $type3 = $term;
+        } else {
+            $other[] = $term;
+        }
+    }
+
+    if ($type1) $sorted[] = $type1;
+    if ($type2) $sorted[] = $type2;
+    if ($type3) $sorted[] = $type3;
+    
+    return array_merge($sorted, $other);
+}
+
+/**
+ * Helper: Sort Events Array by Type
+ * Order: 1. Tournaments/Competitions, 2. Training Camps, 3. Seminars/Masterclasses
+ */
+function gh_sort_events_by_type($posts) {
+    if (empty($posts)) return $posts;
+
+    $type1 = array(); // tournaments
+    $type2 = array(); // camps
+    $type3 = array(); // seminars
+    $other = array(); // other
+
+    foreach ($posts as $post) {
+        $terms = get_the_terms($post->ID, 'event_type');
+        if (!empty($terms) && !is_wp_error($terms)) {
+            $slug = mb_strtolower($terms[0]->slug);
+            if (strpos($slug, 'turnir') !== false || strpos($slug, 'sorevn') !== false || strpos($slug, 'comp') !== false || strpos($slug, 'tourn') !== false) {
+                $type1[] = $post;
+            } elseif (strpos($slug, 'sbor') !== false || strpos($slug, 'camp') !== false || strpos($slug, 'tren') !== false) {
+                $type2[] = $post;
+            } elseif (strpos($slug, 'semin') !== false || strpos($slug, 'master') !== false || strpos($slug, 'klass') !== false || strpos($slug, 'class') !== false) {
+                $type3[] = $post;
+            } else {
+                $other[] = $post;
+            }
+        } else {
+            $other[] = $post;
+        }
+    }
+
+    return array_merge($type1, $type2, $type3, $other);
+}
 
 /**
  * Russian Pluralization Helper

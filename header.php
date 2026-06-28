@@ -44,6 +44,7 @@ $plus_icon = $is_light_header ? 'img/plus-black.svg' : 'img/plus.svg'; // Assumi
                             <li><a href="<?php echo esc_url(home_url('/events/')); ?>" class="dropdown-link">Все</a></li>
                             <?php 
                             $menu_types = get_terms(array('taxonomy' => 'event_type', 'hide_empty' => false));
+                            $menu_types = gh_sort_event_types($menu_types);
                             foreach ($menu_types as $m_type) : ?>
                                 <li><a href="<?php echo esc_url(home_url('/events/?event_type=' . $m_type->slug)); ?>" class="dropdown-link"><?php echo $m_type->name; ?></a></li>
                             <?php endforeach; ?>

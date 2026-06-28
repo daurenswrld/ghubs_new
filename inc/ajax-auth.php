@@ -196,7 +196,18 @@ function gh_ajax_update_profile() {
             $foundation_year = isset($_POST['gh_foundation_year']) ? sanitize_text_field(wp_unslash($_POST['gh_foundation_year'])) : '';
             $pupils_count = isset($_POST['gh_pupils_count']) ? sanitize_text_field(wp_unslash($_POST['gh_pupils_count'])) : '';
             $coaches_count = isset($_POST['gh_coaches_count']) ? sanitize_text_field(wp_unslash($_POST['gh_coaches_count'])) : '';
-            $ranked_athletes_count = isset($_POST['gh_ranked_athletes_count']) ? sanitize_text_field(wp_unslash($_POST['gh_ranked_athletes_count'])) : '';
+            
+            // Separate counts for athlete ranks
+            $zms_count = isset($_POST['gh_zms_count']) ? sanitize_text_field(wp_unslash($_POST['gh_zms_count'])) : '';
+            $msmk_count = isset($_POST['gh_msmk_count']) ? sanitize_text_field(wp_unslash($_POST['gh_msmk_count'])) : '';
+            $ms_count = isset($_POST['gh_ms_count']) ? sanitize_text_field(wp_unslash($_POST['gh_ms_count'])) : '';
+            $kms_count = isset($_POST['gh_kms_count']) ? sanitize_text_field(wp_unslash($_POST['gh_kms_count'])) : '';
+            $razryad_count = isset($_POST['gh_razryad_count']) ? sanitize_text_field(wp_unslash($_POST['gh_razryad_count'])) : '';
+
+            // Calculate total as the sum of all ranks
+            $total_ranked = (int)$zms_count + (int)$msmk_count + (int)$ms_count + (int)$kms_count + (int)$razryad_count;
+            $ranked_athletes_count = $total_ranked > 0 ? (string)$total_ranked : '';
+
             $head_coach = isset($_POST['gh_head_coach']) ? sanitize_text_field(wp_unslash($_POST['gh_head_coach'])) : '';
             $coaches_links = isset($_POST['gh_coaches_links']) ? sanitize_textarea_field(wp_unslash($_POST['gh_coaches_links'])) : '';
             $gyms = isset($_POST['gh_gyms']) ? sanitize_textarea_field(wp_unslash($_POST['gh_gyms'])) : '';
@@ -205,7 +216,15 @@ function gh_ajax_update_profile() {
             update_user_meta($user_id, 'gh_foundation_year', $foundation_year);
             update_user_meta($user_id, 'gh_pupils_count', $pupils_count);
             update_user_meta($user_id, 'gh_coaches_count', $coaches_count);
+            
+            // Save separate ranks
+            update_user_meta($user_id, 'gh_zms_count', $zms_count);
+            update_user_meta($user_id, 'gh_msmk_count', $msmk_count);
+            update_user_meta($user_id, 'gh_ms_count', $ms_count);
+            update_user_meta($user_id, 'gh_kms_count', $kms_count);
+            update_user_meta($user_id, 'gh_razryad_count', $razryad_count);
             update_user_meta($user_id, 'gh_ranked_athletes_count', $ranked_athletes_count);
+
             update_user_meta($user_id, 'gh_head_coach', $head_coach);
             update_user_meta($user_id, 'gh_coaches_links', $coaches_links);
             update_user_meta($user_id, 'gh_gyms', $gyms);

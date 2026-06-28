@@ -238,7 +238,7 @@ get_header(); ?>
                                     </div>
                                     <div class="event-card__bottom">
                                         <div class="meta-item date">
-                                            <img src="<?php echo get_template_directory_uri(); ?>/img/date-gold.svg" alt="Date" class="meta-icon">
+                                            <img src="<?php echo get_template_directory_uri(); ?>/img/date.svg" alt="Date" class="meta-icon">
                                             <span><?php echo gh_format_event_date($date, $end); ?></span>
                                         </div>
                                         <a href="<?php the_permalink(); ?>" class="event-card__arrow">

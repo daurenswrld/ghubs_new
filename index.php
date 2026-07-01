@@ -200,7 +200,7 @@ get_header(); ?>
                             if ($counter == 3) : ?>
                                 <!-- Vertical Ad Banner -->
                                 <?php 
-                                $ads3 = gh_get_active_ads('3', 1);
+                                $ads3 = gh_get_active_ads('3', 1, true);
                                 $ad3_img = !empty($ads3) ? $ads3[0]['image'] : get_template_directory_uri() . '/img/ad-test.png';
                                 $ad3_link = !empty($ads3) ? $ads3[0]['link'] : '#!';
                                 ?>

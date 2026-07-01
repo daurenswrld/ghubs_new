@@ -24,15 +24,21 @@
             <div class="preloader__star">
                 <img src="img/logo.svg" alt="logo">
             </div>
-            <div class="preloader__text">Gymnastics<span>Hub</span></div>
+            <div class="preloader__text notranslate" translate="no">Gymnastics<span>Hub</span></div>
         </div>
     </div>
     <header class="main-header main-header--light">
         <div class="container container--wide">
             <div class="header__logo">
-                <a href="index.html" class="logo">
-                    <img src="img/logo-black.svg" alt="logo">
-                    <span class="logo__text">Gymnastics<span>Hub</span></span>
+                <a href="index.html" class="logo notranslate" translate="no">
+                    <svg width="220" height="35" viewBox="0 0 220 35" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                        <!-- Star -->
+                        <g transform="translate(0, 0) scale(0.47)">
+                            <path d="M36.6602 0L44.437 29.2244L73.3203 37.093L44.437 44.9616L36.6602 74.186L28.8834 44.9616L0 37.093L28.8834 29.2244L36.6602 0Z" fill="#1a1a1a"/>
+                        </g>
+                        <!-- Text -->
+                        <text x="47" y="25" font-family="'Raleway', sans-serif" font-weight="700" font-size="20px" fill="#1a1a1a">Gymnastics<tspan fill="#ff2d55">Hub</tspan></text>
+                    </svg>
                 </a>
             </div>
 

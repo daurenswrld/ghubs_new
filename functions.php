@@ -35,7 +35,7 @@ add_action('after_setup_theme', 'gymnastics_hub_setup');
 function gymnastics_hub_custom_title($title) {
     if (is_front_page()) {
         $title['title'] = 'Gymnastics Hub';
-        $title['tagline'] = 'Спортивные мероприятия по всему миру';
+        $title['tagline'] = 'Спортивные мероприятия по художественной гимнастике по всему миру';
     } elseif (is_singular('gh_event')) {
         $city = get_post_meta(get_the_ID(), '_event_location_city', true);
         if ($city) {

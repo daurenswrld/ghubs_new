@@ -87,7 +87,7 @@ function gh_event_details_callback($post) {
             <td><input type="text" name="event_location_text" value="<?php echo esc_attr($location); ?>" class="regular-text" placeholder="Например: Дворец спорта, Алматы"></td>
         </tr>
         <tr>
-            <th>Стоимость:</th>
+            <th>Стартовый взнос:</th>
             <td><input type="text" name="event_price" value="<?php echo esc_attr($price); ?>" class="regular-text" placeholder="Например: От 5000 ₸"></td>
         </tr>
         <tr>

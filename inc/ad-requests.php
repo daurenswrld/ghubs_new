@@ -58,10 +58,12 @@ function gh_ad_request_metabox_callback($post) {
     $email  = get_post_meta($post->ID, '_ad_user_email', true);
     $url    = get_post_meta($post->ID, '_ad_image_url', true);
     $link   = get_post_meta($post->ID, '_ad_link', true);
+    $type   = get_post_meta($post->ID, '_ad_type', true);
     
     // Publishing settings
     $status = get_post_meta($post->ID, '_ad_publish_status', true);
     $slot   = get_post_meta($post->ID, '_ad_publish_slot', true);
+    $show_on_homepage = get_post_meta($post->ID, '_ad_show_on_homepage', true);
 
     $types = array(
         'b1' => 'Баннер 1 (1662x1056)',
@@ -70,6 +72,39 @@ function gh_ad_request_metabox_callback($post) {
         'b4' => 'Баннер 4 (909x1455)'
     );
     $type_label = isset($types[$type]) ? $types[$type] : $type;
+
+    // Get current homepage ad info
+    $homepage_query = new WP_Query(array(
+        'post_type'      => 'ad_request',
+        'posts_per_page' => 1,
+        'meta_query'     => array(
+            'relation' => 'AND',
+            array(
+                'key'   => '_ad_publish_slot',
+                'value' => '3',
+            ),
+            array(
+                'key'   => '_ad_show_on_homepage',
+                'value' => '1',
+            ),
+            array(
+                'key'   => '_ad_publish_status',
+                'value' => 'active',
+            )
+        )
+    ));
+    
+    $current_homepage_ad_info = '';
+    if ($homepage_query->have_posts()) {
+        $current_homepage_ad = $homepage_query->posts[0];
+        $current_homepage_ad_info = esc_html($current_homepage_ad->post_title) . ' (ID: ' . $current_homepage_ad->ID . ')';
+        if ($current_homepage_ad->ID !== $post->ID) {
+            $edit_url = get_edit_post_link($current_homepage_ad->ID);
+            $current_homepage_ad_info .= ' — <a href="' . esc_url($edit_url) . '" target="_blank">Перейти к редактированию</a>';
+        } else {
+            $current_homepage_ad_info .= ' (этот баннер)';
+        }
+    }
 
     ?>
     <div class="ad-request-admin-flex" style="display: flex; gap: 30px;">
@@ -117,8 +152,38 @@ function gh_ad_request_metabox_callback($post) {
                         </select>
                     </td>
                 </tr>
+                <tr id="homepage_ad_row" style="<?php echo ($slot === '3') ? '' : 'display:none;'; ?>">
+                    <th>Показывать на главной:</th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="ad_show_on_homepage" value="1" <?php checked($show_on_homepage, '1'); ?>>
+                            Выводить этот баннер в Слот 3 на главной странице
+                        </label>
+                        <?php if ($current_homepage_ad_info) : ?>
+                            <p class="description" style="color: #2271b1; margin-top: 5px;">
+                                Сейчас на главной показывается: <strong><?php echo $current_homepage_ad_info; ?></strong>
+                            </p>
+                        <?php else : ?>
+                            <p class="description" style="color: #666; margin-top: 5px;">
+                                Сейчас на главной не выбран конкретный баннер Слот 3 (будет браться последний активный).
+                            </p>
+                        <?php endif; ?>
+                    </td>
+                </tr>
             </table>
             <p class="description" style="color: #d63638;">* При выборе слота и статуса "Активен", этот баннер заменит текущий на сайте.</p>
+            
+            <script>
+            jQuery(document).ready(function($) {
+                $('select[name="ad_publish_slot"]').on('change', function() {
+                    if ($(this).val() === '3') {
+                        $('#homepage_ad_row').show();
+                    } else {
+                        $('#homepage_ad_row').hide();
+                    }
+                });
+            });
+            </script>
         </div>
     </div>
     <?php
@@ -130,7 +195,42 @@ function gh_save_ad_request_publishing_data($post_id) {
         update_post_meta($post_id, '_ad_publish_status', sanitize_text_field($_POST['ad_publish_status']));
     }
     if (isset($_POST['ad_publish_slot'])) {
-        update_post_meta($post_id, '_ad_publish_slot', sanitize_text_field($_POST['ad_publish_slot']));
+        $new_slot = sanitize_text_field($_POST['ad_publish_slot']);
+        update_post_meta($post_id, '_ad_publish_slot', $new_slot);
+        
+        // If slot is changed from 3 to something else, clear homepage status
+        if ($new_slot !== '3') {
+            update_post_meta($post_id, '_ad_show_on_homepage', '0');
+        }
+    }
+    
+    if (isset($_POST['ad_publish_slot']) && $_POST['ad_publish_slot'] === '3') {
+        if (isset($_POST['ad_show_on_homepage']) && $_POST['ad_show_on_homepage'] === '1') {
+            update_post_meta($post_id, '_ad_show_on_homepage', '1');
+            
+            // Clear homepage checkbox for all other slot 3 ads
+            $other_homepage_ads = get_posts(array(
+                'post_type'      => 'ad_request',
+                'posts_per_page' => -1,
+                'post__not_in'   => array($post_id),
+                'meta_query'     => array(
+                    'relation' => 'AND',
+                    array(
+                        'key'   => '_ad_publish_slot',
+                        'value' => '3',
+                    ),
+                    array(
+                        'key'   => '_ad_show_on_homepage',
+                        'value' => '1',
+                    )
+                )
+            ));
+            foreach ($other_homepage_ads as $other_ad) {
+                update_post_meta($other_ad->ID, '_ad_show_on_homepage', '0');
+            }
+        } else {
+            update_post_meta($post_id, '_ad_show_on_homepage', '0');
+        }
     }
 }
 add_action('save_post_ad_request', 'gh_save_ad_request_publishing_data');
@@ -184,7 +284,48 @@ add_action('manage_ad_request_posts_custom_column', 'gh_display_ad_requests_colu
 /**
  * Helper to get active ads for a slot
  */
-function gh_get_active_ads($slot, $limit = -1) {
+function gh_get_active_ads($slot, $limit = -1, $homepage_only = false) {
+    if ($slot === '3' && $homepage_only) {
+        $args = array(
+            'post_type'      => 'ad_request',
+            'posts_per_page' => $limit,
+            'meta_query'     => array(
+                'relation' => 'AND',
+                array(
+                    'key'   => '_ad_publish_status',
+                    'value' => 'active',
+                ),
+                array(
+                    'key'   => '_ad_publish_slot',
+                    'value' => '3',
+                ),
+                array(
+                    'key'   => '_ad_show_on_homepage',
+                    'value' => '1',
+                )
+            ),
+            'orderby' => 'date',
+            'order'   => 'DESC'
+        );
+        $query = new WP_Query($args);
+        $ads = array();
+        if ($query->have_posts()) {
+            foreach ($query->posts as $post) {
+                $image = get_post_meta($post->ID, '_ad_image_url', true);
+                $link  = get_post_meta($post->ID, '_ad_link', true);
+                if ($image) {
+                    $ads[] = array(
+                        'image' => $image,
+                        'link'  => $link ? $link : '#!'
+                    );
+                }
+            }
+        }
+        if (!empty($ads)) {
+            return $ads;
+        }
+    }
+
     $args = array(
         'post_type'      => 'ad_request',
         'posts_per_page' => $limit,
@@ -276,8 +417,16 @@ function gh_handle_ad_request_submission() {
         // Remove filter immediately after
         remove_filter('upload_dir', 'gh_ad_requests_upload_dir');
 
-        if (isset($uploaded_file['url'])) {
-            update_post_meta($post_id, '_ad_image_url', $uploaded_file['url']);
+        if (isset($uploaded_file['file'])) {
+            $webp_file = gh_convert_to_webp($uploaded_file['file']);
+            if ($webp_file) {
+                $info_url = pathinfo($uploaded_file['url']);
+                $filename = pathinfo($webp_file, PATHINFO_BASENAME);
+                $webp_url = $info_url['dirname'] . '/' . $filename;
+                update_post_meta($post_id, '_ad_image_url', $webp_url);
+            } else {
+                update_post_meta($post_id, '_ad_image_url', $uploaded_file['url']);
+            }
         }
     }
 

@@ -345,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (roleOptions.length > 0 && selectedRoleInput) {
         const regDescGroup = document.getElementById('regDescGroup');
+        const fullNameInput = document.querySelector('input[name="full_name"]');
         roleOptions.forEach(option => {
             option.addEventListener('click', () => {
                 // Remove active from others
@@ -362,6 +363,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         regDescGroup.style.display = 'none';
                         const textarea = regDescGroup.querySelector('textarea');
                         if (textarea) textarea.value = '';
+                    }
+                }
+
+                if (fullNameInput) {
+                    if (selectedRole === 'gh_coach') {
+                        fullNameInput.placeholder = 'Фамилия Имя';
+                    } else {
+                        fullNameInput.placeholder = 'Имя / название организации';
                     }
                 }
                 

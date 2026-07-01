@@ -108,7 +108,7 @@ get_header(); ?>
 
                                     <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                         <div class="form-group">
-                                            <input type="text" name="price" class="form-input--pill" placeholder="Стоимость (если есть)">
+                                            <input type="text" name="price" class="form-input--pill" placeholder="Стартовый взнос (если есть)">
                                         </div>
                                         <div class="form-group">
                                             <input type="url" name="reg_url" class="form-input--pill" placeholder="Ссылка на регистрацию">

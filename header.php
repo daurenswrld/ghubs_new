@@ -22,7 +22,7 @@ $plus_icon = $is_light_header ? 'img/plus-black.svg' : 'img/plus.svg'; // Assumi
             <div class="preloader__star">
                 <img src="<?php echo get_template_directory_uri(); ?>/img/logo.svg" alt="logo">
             </div>
-            <div class="preloader__text">Gymnastics<span>Hub</span></div>
+            <div class="preloader__text notranslate" translate="no">Gymnastics<span>Hub</span></div>
         </div>
     </div>
     
@@ -30,9 +30,15 @@ $plus_icon = $is_light_header ? 'img/plus-black.svg' : 'img/plus.svg'; // Assumi
     <header class="main-header <?php echo $header_class; ?>">
         <div class="container container--wide">
             <div class="header__logo">
-                <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">
-                    <img src="<?php echo get_template_directory_uri(); ?>/img/<?php echo $logo_img; ?>" alt="logo">
-                    <span class="logo__text">Gymnastics<span>Hub</span></span>
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="logo notranslate" translate="no">
+                    <svg width="220" height="35" viewBox="0 0 220 35" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                        <!-- Star -->
+                        <g transform="translate(0, 0) scale(0.47)">
+                            <path d="M36.6602 0L44.437 29.2244L73.3203 37.093L44.437 44.9616L36.6602 74.186L28.8834 44.9616L0 37.093L28.8834 29.2244L36.6602 0Z" fill="<?php echo $is_light_header ? '#1a1a1a' : '#ffffff'; ?>"/>
+                        </g>
+                        <!-- Text -->
+                        <text x="47" y="25" font-family="'Raleway', sans-serif" font-weight="700" font-size="20px" fill="<?php echo $is_light_header ? '#1a1a1a' : '#ffffff'; ?>">Gymnastics<tspan fill="#ff2d55">Hub</tspan></text>
+                    </svg>
                 </a>
             </div>
 

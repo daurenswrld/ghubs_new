@@ -15,13 +15,15 @@ get_header(); ?>
     <div class="auth-card">
         <!-- Logo Header -->
         <div class="auth-card__logo-container">
-            <a href="<?php echo home_url(); ?>" class="auth-logo">
-                <div class="auth-logo__star">
-                    <svg width="30" height="31" viewBox="0 0 74 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <a href="<?php echo home_url(); ?>" class="auth-logo notranslate" translate="no">
+                <svg width="190" height="30" viewBox="0 0 190 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block;">
+                    <!-- Star -->
+                    <g transform="translate(0, 3) scale(0.32)">
                         <path d="M36.6602 0L44.437 29.2244L73.3203 37.093L44.437 44.9616L36.6602 74.186L28.8834 44.9616L0 37.093L28.8834 29.2244L36.6602 0Z" fill="black"/>
-                    </svg>
-                </div>
-                <span class="auth-logo__text">Gymnastics<span>Hub</span></span>
+                    </g>
+                    <!-- Text -->
+                    <text x="36" y="22" font-family="'Raleway', sans-serif" font-weight="600" font-size="22px" fill="black" letter-spacing="-0.02em">Gymnastics<tspan fill="#ff2d55">Hub</tspan></text>
+                </svg>
             </a>
         </div>
 

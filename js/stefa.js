@@ -111,6 +111,12 @@ const StefaAI = {
             msgContainer.addEventListener('wheel', stopScroll, { passive: true });
             msgContainer.addEventListener('touchmove', stopScroll, { passive: true });
         }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => this.adjustForKeyboard());
+            window.visualViewport.addEventListener('scroll', () => this.adjustForKeyboard());
+        }
+        window.addEventListener('resize', () => this.adjustForKeyboard());
     },
 
     toggleChat(force) {
@@ -123,10 +129,31 @@ const StefaAI = {
             chatWindow.classList.add('is-active');
             if (trigger) trigger.style.display = 'none';
             if (tooltip) tooltip.style.display = 'none';
+            this.adjustForKeyboard();
         } else {
             chatWindow.classList.remove('is-active');
             if (trigger) trigger.style.display = 'flex';
             if (tooltip) tooltip.style.display = 'block';
+            if (chatWindow) {
+                chatWindow.style.height = '';
+                chatWindow.style.top = '';
+            }
+        }
+    },
+
+    adjustForKeyboard() {
+        const chatWindow = document.getElementById('stefaChat');
+        if (!chatWindow || !this.isOpen) return;
+
+        if (window.innerWidth <= 768) {
+            const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const viewportOffsetTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+            
+            chatWindow.style.height = `${viewportHeight}px`;
+            chatWindow.style.top = `${viewportOffsetTop}px`;
+        } else {
+            chatWindow.style.height = '';
+            chatWindow.style.top = '';
         }
     },
 

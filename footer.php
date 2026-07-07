@@ -311,7 +311,7 @@
         if (!isStandalone && !isDismissed) {
             setTimeout(function() {
                 overlay.classList.add('is-open');
-            }, 100);
+            }, 3000);
         }
     });
     </script>

@@ -160,6 +160,162 @@
         setTimeout(hidePre, 4000); 
     })();
     </script>
+    <!-- PWA Install Modal -->
+    <div class="pwa-install-modal-overlay" id="pwaInstallModalOverlay">
+        <div class="pwa-install-modal">
+            <button class="pwa-install-modal__close" id="pwaInstallClose" aria-label="Закрыть">&times;</button>
+            <div class="pwa-install-modal__icon-wrapper">
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png'); ?>" alt="Gymnastics Hub Icon">
+            </div>
+            <h3 class="pwa-install-modal__title">Установите Gymnastics Hub</h3>
+            <p class="pwa-install-modal__desc">Добавьте наше приложение на рабочий стол для быстрого доступа к мероприятиям и объявлениям!</p>
+            
+            <div class="pwa-install-tabs">
+                <button class="pwa-install-tab-btn" data-target="pwa-step-ios">iOS (Safari)</button>
+                <button class="pwa-install-tab-btn" data-target="pwa-step-android">Android</button>
+                <button class="pwa-install-tab-btn" data-target="pwa-step-pc">ПК / Ноутбук</button>
+            </div>
+
+            <div class="pwa-install-content">
+                <div class="pwa-install-step" id="pwa-step-ios">
+                    <ol>
+                        <li>Нажмите кнопку <strong>«Поделиться»</strong> в нижней панели Safari (иконка квадрата со стрелкой вверх).</li>
+                        <li>В открывшемся меню выберите пункт <strong>«На экран "Домой"»</strong>.</li>
+                        <li>Нажмите кнопку <strong>«Добавить»</strong> в верхнем правом углу.</li>
+                    </ol>
+                </div>
+                <div class="pwa-install-step" id="pwa-step-android">
+                    <ol>
+                        <li>Нажмите кнопку <strong>«Установить»</strong> ниже (или нажмите на три точки в углу браузера).</li>
+                        <li>Выберите пункт <strong>«Установить приложение»</strong> (или «Добавить на гл. экран»).</li>
+                        <li>Подтвердите установку.</li>
+                    </ol>
+                </div>
+                <div class="pwa-install-step" id="pwa-step-pc">
+                    <ol>
+                        <li>Нажмите на иконку <strong>«Установить»</strong> (монитор со стрелкой) в правой части адресной строки браузера.</li>
+                        <li>Во всплывающем окне подтвердите установку, нажав кнопку <strong>«Установить»</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <button class="pwa-install-modal__action-btn" id="pwaInstallActionBtn">Установить</button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var overlay = document.getElementById('pwaInstallModalOverlay');
+        var closeBtn = document.getElementById('pwaInstallClose');
+        var actionBtn = document.getElementById('pwaInstallActionBtn');
+        var tabButtons = document.querySelectorAll('.pwa-install-tab-btn');
+        var steps = document.querySelectorAll('.pwa-install-step');
+        var deferredPrompt = null;
+
+        // Listen for BeforeInstallPrompt event
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Detect Platform to pre-select correct tab
+        function detectPlatform() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return 'ios';
+            }
+            if (/android/i.test(userAgent)) {
+                return 'android';
+            }
+            return 'pc';
+        }
+
+        function selectTab(platform) {
+            var targetId = 'pwa-step-' + platform;
+            
+            tabButtons.forEach(function(btn) {
+                if (btn.getAttribute('data-target') === targetId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            steps.forEach(function(step) {
+                if (step.id === targetId) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+
+            // Adjust CTA button text/visibility
+            if (platform === 'ios') {
+                actionBtn.textContent = 'Понятно';
+            } else {
+                actionBtn.textContent = 'Установить';
+            }
+        }
+
+        // Initialize Tab
+        var userPlatform = detectPlatform();
+        selectTab(userPlatform);
+
+        // Bind Tab Clicks
+        tabButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var targetId = btn.getAttribute('data-target');
+                var platform = targetId.replace('pwa-step-', '');
+                selectTab(platform);
+            });
+        });
+
+        // Close logic
+        function closeModal() {
+            overlay.classList.remove('is-open');
+            localStorage.setItem('pwa_prompt_dismissed', 'true');
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closeModal();
+            }
+        });
+
+        // Action button click
+        actionBtn.addEventListener('click', function() {
+            var activeTab = document.querySelector('.pwa-install-tab-btn.active');
+            var platform = activeTab.getAttribute('data-target').replace('pwa-step-', '');
+
+            if (platform === 'ios') {
+                closeModal();
+            } else if (platform === 'android' || platform === 'pc') {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(function(choiceResult) {
+                        deferredPrompt = null;
+                        closeModal();
+                    });
+                } else {
+                    alert('Пожалуйста, воспользуйтесь стандартной инструкцией во вкладке выше для вашего браузера.');
+                    closeModal();
+                }
+            }
+        });
+
+        // Check standalone mode and localStorage to show modal after 5 seconds
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        var isDismissed = localStorage.getItem('pwa_prompt_dismissed') === 'true';
+
+        if (!isStandalone && !isDismissed) {
+            setTimeout(function() {
+                overlay.classList.add('is-open');
+            }, 5000);
+        }
+    });
+    </script>
+
     <?php wp_footer(); ?>
 </body>
 </html>

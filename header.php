@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 	<meta name="google-site-verification" content="3YZvsjZcb8PJ-xCtCQySjaOR7f3pymHREFGE5_pYJP4" />
 	
+	<!-- PWA Configuration -->
+	<link rel="manifest" href="<?php echo esc_url(home_url('/manifest.json')); ?>">
+	<meta name="theme-color" content="#ff2d55">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="apple-touch-icon" href="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png'); ?>">
+	
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('<?php echo esc_url(home_url('/service-worker.js')); ?>')
+					.then(reg => console.log('Service Worker registered:', reg.scope))
+					.catch(err => console.error('Service Worker registration failed:', err));
+			});
+		}
+	</script>
+
     <?php wp_head(); ?>
 </head>
 <?php

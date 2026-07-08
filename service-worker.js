@@ -1,16 +1,18 @@
-const CACHE_NAME = 'gh-cache-v1';
+const CACHE_NAME = 'gh-cache-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/wp-content/themes/gymnastics_hub_new/style.css',
-  '/wp-content/themes/gymnastics_hub_new/js/stefa.js',
-  '/wp-content/themes/gymnastics_hub_new/img/app-icon-192.png',
-  '/wp-content/themes/gymnastics_hub_new/img/app-icon-512.png'
+  './',
+  'wp-content/themes/gymnastics_hub_new/style.css',
+  'wp-content/themes/gymnastics_hub_new/js/stefa.js',
+  'wp-content/themes/gymnastics_hub_new/img/app-icon-192.png',
+  'wp-content/themes/gymnastics_hub_new/img/app-icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch(() => {});
+      return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
+        console.error('PWA Cache pre-adding failed:', err);
+      });
     })
   );
   self.skipWaiting();

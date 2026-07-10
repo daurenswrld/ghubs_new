@@ -59,9 +59,9 @@
     </div>
 
     <!-- AI Assistant Widget -->
-    <div class="ai-widget-container">
+    <div class="ai-widget-container notranslate" translate="no">
         <div class="ai-tooltip">Привет! Я Стефа 👋 <br> Чем могу помочь?</div>
-        <a href="#" class="ai-widget" title="AI Ассистент">
+        <a href="#" class="ai-widget notranslate" translate="no" title="AI Ассистент">
             <img src="<?php echo get_template_directory_uri(); ?>/img/ai-btn.png" alt="AI">
         </a>
     </div>
@@ -165,7 +165,7 @@
         <div class="pwa-install-modal">
             <button class="pwa-install-modal__close" id="pwaInstallClose" aria-label="Закрыть">&times;</button>
             <div class="pwa-install-modal__icon-wrapper">
-                <img src="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png'); ?>" alt="Gymnastics Hub Icon">
+                <img src="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png?v=3'); ?>" alt="Gymnastics Hub Icon">
             </div>
             <h3 class="pwa-install-modal__title">Установите Gymnastics Hub</h3>
             <p class="pwa-install-modal__desc">Добавьте наше приложение на рабочий стол для быстрого доступа к мероприятиям и объявлениям!</p>

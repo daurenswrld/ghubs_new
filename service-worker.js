@@ -1,10 +1,10 @@
-const CACHE_NAME = 'gh-cache-v2';
+const CACHE_NAME = 'gh-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   'wp-content/themes/gymnastics_hub_new/style.css',
   'wp-content/themes/gymnastics_hub_new/js/stefa.js',
-  'wp-content/themes/gymnastics_hub_new/img/app-icon-192.png',
-  'wp-content/themes/gymnastics_hub_new/img/app-icon-512.png'
+  'wp-content/themes/gymnastics_hub_new/img/app-icon-192.png?v=3',
+  'wp-content/themes/gymnastics_hub_new/img/app-icon-512.png?v=3'
 ];
 
 self.addEventListener('install', (event) => {

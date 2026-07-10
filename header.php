@@ -10,7 +10,7 @@
 	<meta name="theme-color" content="#ff2d55">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<link rel="apple-touch-icon" href="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png'); ?>">
+	<link rel="apple-touch-icon" href="<?php echo esc_url(get_template_directory_uri() . '/img/app-icon-192.png?v=3'); ?>">
 	
 	<script>
 		if ('serviceWorker' in navigator) {

@@ -4919,6 +4919,9 @@ body.dark-theme {
   align-items: flex-end;
   gap: 20px;
 }
+.ai-widget-container:has(.ai-chat-window.is-active) {
+  z-index: 10005;
+}
 @media (max-width: 768px) {
   .ai-widget-container {
     bottom: 20px;
@@ -5146,7 +5149,7 @@ body.dark-theme {
   background: none;
   border: none;
   padding: 10px 0;
-  font-size: 14px;
+  font-size: 16px; /* Prevent iOS zoom */
   color: #000;
   outline: none;
 }

@@ -21,7 +21,7 @@ const StefaAI = {
 
     injectHTML() {
         const chatHTML = `
-            <div class="ai-chat-window" id="stefaChat">
+            <div class="ai-chat-window notranslate" translate="no" id="stefaChat">
                 <div class="ai-chat-window__header">
                     <div class="stefa-avatar">
                         <img src="${window.themeData?.templateUri || ''}/img/ai-btn.png" alt="Стефа">
@@ -56,12 +56,19 @@ const StefaAI = {
         let container = document.querySelector('.ai-widget-container');
         if (!container) {
             container = document.createElement('div');
-            container.className = 'ai-widget-container';
-            container.innerHTML = `<a href="#" class="ai-widget" id="stefaTrigger"><img src="${window.themeData?.templateUri || ''}/img/ai-btn.png" alt="AI"></a>`;
+            container.className = 'ai-widget-container notranslate';
+            container.setAttribute('translate', 'no');
+            container.innerHTML = `<a href="#" class="ai-widget notranslate" translate="no" id="stefaTrigger"><img src="${window.themeData?.templateUri || ''}/img/ai-btn.png" alt="AI"></a>`;
             document.body.appendChild(container);
         } else {
+            container.classList.add('notranslate');
+            container.setAttribute('translate', 'no');
             const trigger = container.querySelector('.ai-widget');
-            if (trigger) trigger.id = 'stefaTrigger';
+            if (trigger) {
+                trigger.id = 'stefaTrigger';
+                trigger.classList.add('notranslate');
+                trigger.setAttribute('translate', 'no');
+            }
         }
         
         container.insertAdjacentHTML('afterbegin', chatHTML);
@@ -123,17 +130,20 @@ const StefaAI = {
         const chatWindow = document.getElementById('stefaChat');
         const trigger = document.getElementById('stefaTrigger');
         const tooltip = document.querySelector('.ai-tooltip');
+        const gtranslate = document.querySelector('.gtranslate-fixed-left');
         this.isOpen = force !== undefined ? force : !this.isOpen;
         
         if (this.isOpen) {
             chatWindow.classList.add('is-active');
             if (trigger) trigger.style.display = 'none';
             if (tooltip) tooltip.style.display = 'none';
+            if (gtranslate) gtranslate.style.setProperty('display', 'none', 'important');
             this.adjustForKeyboard();
         } else {
             chatWindow.classList.remove('is-active');
             if (trigger) trigger.style.display = 'flex';
             if (tooltip) tooltip.style.display = 'block';
+            if (gtranslate) gtranslate.style.setProperty('display', '', '');
             if (chatWindow) {
                 chatWindow.style.height = '';
                 chatWindow.style.top = '';

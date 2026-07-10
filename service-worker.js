@@ -1,6 +1,7 @@
-const CACHE_NAME = 'gh-cache-v3';
+const CACHE_NAME = 'gh-cache-v4';
 const ASSETS_TO_CACHE = [
   './',
+  './?source=pwa',
   'wp-content/themes/gymnastics_hub_new/style.css',
   'wp-content/themes/gymnastics_hub_new/js/stefa.js',
   'wp-content/themes/gymnastics_hub_new/img/app-icon-192.png?v=3',
